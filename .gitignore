@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+*.local
+
+# Foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Web
+web/dist/
+
+# Temp
+*.zip
