@@ -11,8 +11,15 @@ export interface ChecklistResult {
   missingFields: string[];
 }
 
+const VALID_CATEGORIES = new Set(["testnet", "mainnet"]);
+
 export function scoreChecklist(fields: SubmissionFields): ChecklistResult {
-  const missing = REQUIRED_FIELDS.filter((f) => !fields[f]?.trim());
+  const missing = REQUIRED_FIELDS.filter((f) => {
+    const v = fields[f]?.trim();
+    if (!v) return true;
+    if (f === "category") return !VALID_CATEGORIES.has(v);
+    return false;
+  });
   return {
     completionPct: Math.round(((REQUIRED_FIELDS.length - missing.length) / REQUIRED_FIELDS.length) * 100),
     missingFields: missing,

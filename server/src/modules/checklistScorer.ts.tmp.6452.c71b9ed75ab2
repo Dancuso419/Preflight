@@ -1,0 +1,45 @@
+// TRD 3.3 — Checklist Scorer
+const REQUIRED_FIELDS = [
+  "title", "problemStatement", "solution", "githubUrl",
+  "demoVideoUrl", "contractAddress", "deploymentUrl", "category", "socialPostUrl",
+] as const;
+
+export type SubmissionFields = Partial<Record<typeof REQUIRED_FIELDS[number], string>>;
+
+export interface ChecklistResult {
+  completionPct: number;
+  missingFields: string[];
+}
+
+export function scoreChecklist(fields: SubmissionFields): ChecklistResult {
+  const missing = REQUIRED_FIELDS.filter((f) => {
+    if (!fields[f]?.trim()) return true;
+    if (f === "category" && fields[f] !== "testnet" && fields[f] !== "mainnet") return true;
+    return false;
+  });
+  return {
+    completionPct: Math.round(((REQUIRED_FIELDS.length - missing.length) / REQUIRED_FIELDS.length) * 100),
+    missingFields: missing,
+  };
+}
+
+if (require.main === module) {
+  const full: SubmissionFields = {
+    title: "PreFlight", problemStatement: "Builders submit blind", solution: "AI pre-judge",
+    githubUrl: "https://github.com/x/y", demoVideoUrl: "https://youtube.com/x",
+    contractAddress: "0xABC", deploymentUrl: "https://app.xyz", category: "testnet",
+    socialPostUrl: "https://x.com/post/1",
+  };
+  const r1 = scoreChecklist(full);
+  console.assert(r1.completionPct === 100, "full submission should be 100%");
+  console.assert(r1.missingFields.length === 0, "no missing fields");
+
+  const r2 = scoreChecklist({ title: "Only Title" });
+  console.assert(r2.missingFields.length === 8, "8 fields missing");
+  console.assert(r2.completionPct === 11, "~11% complete");
+
+  const r3 = scoreChecklist({ ...full, category: "invalid" });
+  console.assert(r3.missingFields.includes("category"), "bad category flagged");
+
+  console.log("checklistScorer: all checks passed");
+}
