@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
-    "test": "tsx src/modules/checklistScorer.test.ts && tsx src/modules/repoScanner.test.ts && tsx src/modules/liveAppChecker.test.ts",
+    "test": "tsx src/modules/checklistScorer.test.ts && tsx src/modules/repoScanner.test.ts && tsx src/modules/liveAppChecker.test.ts && tsx src/modules/contractVerifier.test.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },

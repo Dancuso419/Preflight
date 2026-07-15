@@ -37,7 +37,7 @@
 | `checklistScorer` | ✅ | 6 passing | validates 9 fields + category enum guard |
 | `repoScanner` | ✅ | 8 passing | GitHub API, eligibility, README, bulk_import flag, DI fetcher |
 | `liveAppChecker` | ✅ | 10 passing | placeholder pattern scan, DI fetcher, unreachable handled |
-| `contractVerifier` | ⬜ | — | Monad RPC bytecode check |
+| `contractVerifier` | ✅ | 7 passing | eth_getCode via Monad RPC, DI fetcher, invalid addr throws, RPC failure safe |
 | `x402Tester` | ⬜ | — | 5-step payment flow simulation |
 | `gemminiEngine` | ⬜ | — | aggregates all modules, calls Gemmini AI |
 | `attestationMinter` | ⬜ | — | calls deployed contract via Monskills |
@@ -80,8 +80,7 @@
 ---
 
 ## Next Up (TRD build order)
-1. `contractVerifier` — Monad RPC via Monskills
-3. `x402Tester` — 5-step payment simulation
+1. `x402Tester` — 5-step payment simulation
 4. `gemminiEngine` — aggregation + Gemmini API call
 5. Deploy contract → `attestationMinter`
 6. Frontend UI (impeccable skill)
