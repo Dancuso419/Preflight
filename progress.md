@@ -38,7 +38,7 @@
 | `repoScanner` | ✅ | 8 passing | GitHub API, eligibility, README, bulk_import flag, DI fetcher |
 | `liveAppChecker` | ✅ | 10 passing | placeholder pattern scan, DI fetcher, unreachable handled |
 | `contractVerifier` | ✅ | 7 passing | eth_getCode via Monad RPC, DI fetcher, invalid addr throws, RPC failure safe |
-| `x402Tester` | ⬜ | — | 5-step payment flow simulation |
+| `x402Tester` | ✅ | 9 passing | 5-step flow, sequential DI requester, short-circuits on step 1 fail |
 | `gemminiEngine` | ⬜ | — | aggregates all modules, calls Gemmini AI |
 | `attestationMinter` | ⬜ | — | calls deployed contract via Monskills |
 
@@ -80,8 +80,7 @@
 ---
 
 ## Next Up (TRD build order)
-1. `x402Tester` — 5-step payment simulation
-4. `gemminiEngine` — aggregation + Gemmini API call
+1. `gemminiEngine` — aggregation + Gemmini API call
 5. Deploy contract → `attestationMinter`
 6. Frontend UI (impeccable skill)
 7. Wallet connect (Para / monskills wallet-integration)
