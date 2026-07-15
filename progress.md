@@ -40,7 +40,7 @@
 | `contractVerifier` | ✅ | 7 passing | eth_getCode via Monad RPC, DI fetcher, invalid addr throws, RPC failure safe |
 | `x402Tester` | ✅ | 9 passing | 5-step flow, sequential DI requester, short-circuits on step 1 fail |
 | `gemminiEngine` | ✅ | 8 passing | context aggregation, prompt builder, JSON parse (incl. markdown fence), readinessPct formula |
-| `attestationMinter` | ⬜ | — | calls deployed contract via Monskills |
+| `attestationMinter` | ✅ | 7 passing | viem writeContract, keccak256 report hash, score guard, DI caller |
 
 ---
 
@@ -80,9 +80,10 @@
 ---
 
 ## Next Up (TRD build order)
-1. Deploy contract → `attestationMinter`
-6. Frontend UI (impeccable skill)
-7. Wallet connect (Para / monskills wallet-integration)
+1. Deploy contract to Monad testnet (needs monskills wallet + faucet funds)
+2. Set `ATTESTATION_CONTRACT_ADDRESS` in server `.env`
+3. Frontend UI (impeccable skill)
+4. Wallet connect (Para / monskills wallet-integration)
 
 ---
 

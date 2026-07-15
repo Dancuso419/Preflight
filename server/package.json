@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
-    "test": "tsx src/modules/checklistScorer.test.ts && tsx src/modules/repoScanner.test.ts && tsx src/modules/liveAppChecker.test.ts && tsx src/modules/contractVerifier.test.ts && tsx src/modules/x402Tester.test.ts && tsx src/modules/gemminiEngine.test.ts",
+    "test": "tsx src/modules/checklistScorer.test.ts && tsx src/modules/repoScanner.test.ts && tsx src/modules/liveAppChecker.test.ts && tsx src/modules/contractVerifier.test.ts && tsx src/modules/x402Tester.test.ts && tsx src/modules/gemminiEngine.test.ts && tsx src/modules/attestationMinter.test.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -17,7 +17,8 @@
     "axios": "^1.18.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "viem": "^2.55.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
