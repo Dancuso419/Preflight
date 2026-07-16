@@ -15,7 +15,7 @@ function makeRequester(responses: Array<{ status: number; data: unknown }>) {
   let i = 0;
   return async (_method: string, _url: string, _headers?: Record<string, string>) => {
     if (i >= responses.length) throw new Error(`Unexpected request #${i + 1}`);
-    return responses[i++];
+    return responses[i++]!;
   };
 }
 
@@ -48,8 +48,8 @@ const happyRequester = () => makeRequester([
       signer: dummySigner, facilitatorChecker: facilitatorOk,
     });
     assert.equal(r.healthy, false);
-    assert.equal(r.steps[0].step, "handshake");
-    assert.equal(r.steps[0].passed, false);
+    assert.equal(r.steps[0]!.step, "handshake");
+    assert.equal(r.steps[0]!.passed, false);
   }
 
   // 3 — step 1 fails: 402 but missing invoice fields → short-circuit
@@ -59,7 +59,7 @@ const happyRequester = () => makeRequester([
       signer: dummySigner, facilitatorChecker: facilitatorOk,
     });
     assert.equal(r.healthy, false);
-    assert.ok(r.steps[0].reason?.includes("Missing"), `reason: ${r.steps[0].reason}`);
+    assert.ok(r.steps[0]!.reason?.includes("Missing"), `reason: ${r.steps[0]!.reason}`);
   }
 
   // 4 — step 2 fails: payment rejected (server returns 402 even with X-Payment)
@@ -135,7 +135,7 @@ const happyRequester = () => makeRequester([
       signer: dummySigner, facilitatorChecker: facilitatorOk,
     });
     assert.equal(r.healthy, false);
-    assert.equal(r.steps[0].passed, false);
+    assert.equal(r.steps[0]!.passed, false);
   }
 
   console.log("x402Tester: all tests passed");

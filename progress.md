@@ -17,6 +17,7 @@
 | Foundry installed | ✅ | v1.7.1 |
 | OpenZeppelin installed | ✅ | via `forge install` |
 | `tsx` (TS runner) | ✅ | replaces broken `ts-node` on Node 24 + TS 7 |
+| Agent wallet | ✅ | `0x386525226239a33b71ECA15A13F7Ed08508B02B3` (monskills keystore) |
 
 ---
 
@@ -24,10 +25,10 @@
 | Task | Status | Notes |
 |------|--------|-------|
 | `PreFlightAttestation.sol` | ✅ | ERC721 + Ownable, mint threshold ≥80% enforced onchain |
-| Foundry tests (3 tests) | ✅ | mint pass, mint block, access control — all pass |
-| Deploy script (`Deploy.s.sol`) | ✅ | stub ready, needs `BACKEND_SIGNER_ADDRESS` env |
-| Deploy to Monad testnet | ⬜ | needs monskills wallet + funded signer |
-| Contract verification | ⬜ | after deploy, use monskills verification API |
+| Foundry tests (10 tests) | ✅ | All security cases pass — soulbound, CEI, token IDs from 1 |
+| Deploy script (`Deploy.s.sol`) | ✅ | reads `BACKEND_SIGNER_ADDRESS` env var |
+| Deploy to Monad testnet | ✅ | `0x659A05Bab409E6Ccb76a715c9167d8A0344A4897` (chain 10143) |
+| Contract verification | ⬜ | optional: use monskills verification API |
 
 ---
 
@@ -47,9 +48,9 @@
 ## API Routes (`server/src/routes/`)
 | Route | Status | Notes |
 |-------|--------|-------|
-| `POST /api/review` | ⬜ stub | wired to parallel `Promise.all`, needs modules done |
-| `POST /api/mint` | ⬜ stub | blocked on attestationMinter |
-| `GET /api/attestation/:wallet` | ⬜ stub | blocked on contract deploy |
+| `POST /api/review` | 🔧 stub | needs real module wiring |
+| `POST /api/mint` | 🔧 stub | needs attestationMinter wiring |
+| `GET /api/attestation/:wallet` | 🔧 stub | needs contract read wiring |
 
 ---
 
@@ -58,9 +59,9 @@
 |-----------|--------|-------|
 | Wagmi config (Monad testnet) | ✅ | chain id 10143 wired |
 | `types/index.ts` | ✅ | `ReviewInputs`, `GemminiReport` shared types |
-| `InputForm` | ⬜ stub | needs UI implementation (impeccable skill) |
-| `ResultsDashboard` | ⬜ stub | readiness score, category bars, AI breakdown |
-| `BadgeViewer` | ⬜ stub | tx hash, explorer link, shareable card |
+| `InputForm` | ⬜ | needs UI implementation (impeccable skill) |
+| `ResultsDashboard` | ⬜ | readiness score, category bars, AI breakdown |
+| `BadgeViewer` | ⬜ | tx hash, explorer link, shareable card |
 | Wallet connect (Para) | ⬜ | monskills wallet-integration skill |
 
 ---
@@ -68,23 +69,23 @@
 ## Environment Variables
 | Variable | Status |
 |----------|--------|
-| `GITHUB_API_TOKEN` | ⬜ fill in `.env` |
-| `GEMMINI_API_KEY` | ⬜ fill in `.env` |
-| `GEMMINI_MODEL_ENDPOINT` | ⬜ fill in `.env` |
-| `MONAD_RPC_URL_TESTNET` | ⬜ fill in `.env` |
-| `MONAD_RPC_URL_MAINNET` | ⬜ fill in `.env` |
-| `BACKEND_SIGNER_PRIVATE_KEY` | ⬜ fill in `.env` |
-| `ATTESTATION_CONTRACT_ADDRESS` | ⬜ set after deploy |
-| `X402_TEST_WALLET_ADDRESS` | ⬜ fill in `.env` |
+| `GITHUB_API_TOKEN` | ⬜ fill in `server/.env` |
+| `GEMMINI_API_KEY` | ⬜ fill in `server/.env` |
+| `GEMMINI_MODEL_ENDPOINT` | ⬜ fill in `server/.env` |
+| `MONAD_RPC_URL_TESTNET` | ✅ `https://testnet-rpc.monad.xyz` |
+| `MONAD_RPC_URL_MAINNET` | ✅ `https://rpc.monad.xyz` |
+| `BACKEND_SIGNER_PRIVATE_KEY` | ✅ set (agent wallet) |
+| `ATTESTATION_CONTRACT_ADDRESS` | ✅ `0x659A05Bab409E6Ccb76a715c9167d8A0344A4897` |
+| `X402_TEST_WALLET_ADDRESS` | ⬜ fill in `server/.env` |
 
 ---
 
-## Next Up (TRD build order)
-1. Deploy contract to Monad testnet (needs monskills wallet + faucet funds)
-2. Set `ATTESTATION_CONTRACT_ADDRESS` in server `.env`
-3. Frontend UI (impeccable skill)
-4. Wallet connect (Para / monskills wallet-integration)
+## Next Up
+1. Wire API routes (`POST /api/review`, `POST /api/mint`, `GET /api/attestation/:wallet`)
+2. Frontend UI (impeccable skill)
+3. Wallet connect (Para / monskills wallet-integration)
+4. Fill in `GITHUB_API_TOKEN`, `GEMMINI_API_KEY`, `GEMMINI_MODEL_ENDPOINT`, `X402_TEST_WALLET_ADDRESS`
 
 ---
 
-_Last updated: 2026-07-15_
+_Last updated: 2026-07-16_

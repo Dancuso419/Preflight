@@ -19,7 +19,7 @@ export type GithubFetcher = (url: string) => Promise<unknown>;
 function parseGitHubUrl(url: string): { owner: string; repo: string } {
   const m = url.match(/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/);
   if (!m) throw new Error(`Invalid GitHub URL: ${url}`);
-  return { owner: m[1], repo: m[2] };
+  return { owner: m[1]!, repo: m[2]! };
 }
 
 const defaultFetcher: GithubFetcher = async (url) => {
@@ -50,7 +50,7 @@ export async function scanRepo(repoUrl: string, fetcher: GithubFetcher = default
 
   // ponytail: bulk import = 10+ commits spanning less than 1 hour
   if (commits.length >= 10) {
-    const newest = new Date(commits[0].commit.committer.date).getTime();
+    const newest = new Date(commits[0]!.commit.committer.date).getTime();
     const oldest = new Date(firstCommitDate!).getTime();
     if (newest - oldest < 3_600_000) flags.push("bulk_import");
   }

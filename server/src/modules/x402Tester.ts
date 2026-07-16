@@ -33,7 +33,7 @@ const MONAD_NETWORKS = new Set(["monad-testnet", "monad-mainnet"]);
 const INVOICE_FIELDS = ["scheme", "price", "network", "facilitator"] as const;
 
 const defaultRequester: Requester = async (method, url, headers) => {
-  const res = await axios({ method, url, headers, validateStatus: () => true });
+  const res = await axios.request({ method, url, ...(headers && { headers }), validateStatus: () => true });
   return { status: res.status, data: res.data };
 };
 
