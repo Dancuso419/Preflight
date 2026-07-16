@@ -1,4 +1,4 @@
-import { createConfig, http } from "wagmi";
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { defineChain } from "viem";
 
 export const monadTestnet = defineChain({
@@ -10,7 +10,9 @@ export const monadTestnet = defineChain({
   testnet: true,
 });
 
-export const wagmiConfig = createConfig({
+export const wagmiConfig = getDefaultConfig({
+  appName: "PreFlight",
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID ?? "preflightdemo",
   chains: [monadTestnet],
-  transports: { [monadTestnet.id]: http() },
+  ssr: false,
 });

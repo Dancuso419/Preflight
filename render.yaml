@@ -1,0 +1,40 @@
+services:
+  # ── Backend API (deploy this first) ───────────────────────────────────
+  - type: web
+    name: preflight-api
+    runtime: node
+    rootDir: server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GITHUB_API_TOKEN
+        sync: false
+      - key: GEMMINI_API_KEY
+        sync: false
+      - key: GEMMINI_MODEL_ENDPOINT
+        sync: false
+      - key: MONAD_RPC_URL_TESTNET
+        value: https://testnet-rpc.monad.xyz
+      - key: MONAD_RPC_URL_MAINNET
+        value: https://rpc.monad.xyz
+      - key: BACKEND_SIGNER_PRIVATE_KEY
+        sync: false
+      - key: ATTESTATION_CONTRACT_ADDRESS
+        value: "0x659A05Bab409E6Ccb76a715c9167d8A0344A4897"
+
+  # ── Frontend static site ──────────────────────────────────────────────
+  - type: web
+    name: preflight-web
+    runtime: static
+    rootDir: web
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      # Set this to your preflight-api URL after the backend deploys
+      # e.g. https://preflight-api.onrender.com
+      - key: VITE_API_URL
+        sync: false
+      - key: VITE_WALLETCONNECT_PROJECT_ID
+        sync: false

@@ -34,7 +34,7 @@ export function BadgeViewer({ txHash, tokenId, explorerLink, score, onReset }: P
 
           <div>
             <div className="badge-title">PreFlight Ready</div>
-            <div className="badge-monad" style={{ marginTop: "8px" }}>Verified on Monad</div>
+            <div className="badge-network" style={{ marginTop: "8px" }}>Verified on Monad</div>
           </div>
 
           <div className="badge-score-pill" aria-label={`Readiness score: ${score}%`}>
@@ -70,7 +70,7 @@ export function BadgeViewer({ txHash, tokenId, explorerLink, score, onReset }: P
         >
           ↗ View on Explorer
         </a>
-        <button className="btn btn--yellow" onClick={copyLink}>
+        <button className="btn btn--surface" onClick={copyLink}>
           {copied ? "✓ Copied!" : "⎘ Copy Link"}
         </button>
         <button className="btn btn--ghost" onClick={onReset}>
