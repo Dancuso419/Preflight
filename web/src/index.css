@@ -315,7 +315,14 @@ main { padding-top: 80px; }
 
 @media (max-width: 768px) {
   .hero-inner { grid-template-columns: 1fr; }
-  .hero-terminal { display: none; }
+  .hero-terminal { transform: none; max-width: 100%; }
+  .terminal-body { font-size: 0.76rem; padding: 14px 16px; }
+}
+
+@media (max-width: 480px) {
+  .hero-terminal { border-radius: 8px; }
+  .terminal-body { font-size: 0.72rem; padding: 12px 14px; line-height: 1.6; }
+  .terminal-title { font-size: 0.68rem; }
 }
 
 .hero-title { margin-bottom: 20px; }
