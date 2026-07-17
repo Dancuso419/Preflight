@@ -397,7 +397,8 @@ function App() {
     setReport(null);
     setBadge(null);
     setError(null);
-    window.scrollTo({ top: 0 });
+    window.history.replaceState(null, "", window.location.pathname);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (

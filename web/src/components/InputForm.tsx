@@ -43,6 +43,7 @@ export function InputForm({ onSubmit, loading = false }: Props) {
   const [animating, setAnimating] = useState(false);
   const [touched, setTouched] = useState<Partial<Record<keyof F, boolean>>>({});
   const firstRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const hasNavigated = useRef(false);
 
   function set(key: keyof F, val: string) {
     setForm((p) => ({ ...p, [key]: val }));
@@ -51,14 +52,16 @@ export function InputForm({ onSubmit, loading = false }: Props) {
     setTouched((p) => ({ ...p, [key]: true }));
   }
 
-  // Focus first field when step changes
+  // Only focus first field after user navigates (not on initial mount)
   useEffect(() => {
+    if (!hasNavigated.current) return;
     const t = setTimeout(() => firstRef.current?.focus(), 260);
     return () => clearTimeout(t);
   }, [step]);
 
   function go(next: number) {
     if (animating) return;
+    hasNavigated.current = true;
     setDir(next > step ? "fwd" : "back");
     setAnimating(true);
     setTimeout(() => {
