@@ -22,7 +22,7 @@ function verdict(pct: number) {
 
 export function ShareCard({ report, projectTitle }: Props) {
   const tweetText = encodeURIComponent(
-    `"${projectTitle}" scored ${report.readinessPct}% Readiness on PreFlight — the AI co-judge for Monad hackathon builders.\n\nDon't let the first AI judge your project be the one that decides your fate. 🚀\n\n#Monad #Hackathon`
+    `"${projectTitle}" scored ${report.readinessPct}% Readiness on PreFlight — the AI co-judge for Monad hackathon builders.\n\nDon't let the first AI judge your project be the one that decides your fate. 🚀\n\nhttps://preflight-web.onrender.com\n\n#Monad #Hackathon`
   );
   const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
 
