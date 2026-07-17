@@ -11,8 +11,8 @@ const router = Router();
 router.post("/", async (req: Request, res: Response) => {
   const { repoUrl, liveUrl, contractAddress, network, x402Endpoint, submission } = req.body;
 
-  if (!repoUrl || !liveUrl || !contractAddress || !submission) {
-    res.status(400).json({ error: "repoUrl, liveUrl, contractAddress, and submission are required" });
+  if (!repoUrl || !submission) {
+    res.status(400).json({ error: "repoUrl and submission are required" });
     return;
   }
 
@@ -20,9 +20,9 @@ router.post("/", async (req: Request, res: Response) => {
     // ponytail: parallel — all validators fire simultaneously
     const [repo, app, checklist, contract, x402] = await Promise.all([
       scanRepo(repoUrl),
-      checkLiveApp(liveUrl),
+      liveUrl ? checkLiveApp(liveUrl) : Promise.resolve({ functionalScore: 0, summary: "Not provided — skipped", flags: [] }),
       scoreChecklist(submission),
-      verifyContract(contractAddress, network),
+      contractAddress ? verifyContract(contractAddress, network) : Promise.resolve({ deployed: false, network: network ?? "testnet", address: "" }),
       x402Endpoint ? testX402(x402Endpoint) : Promise.resolve(null),
     ]);
 
