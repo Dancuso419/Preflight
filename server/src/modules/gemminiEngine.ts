@@ -33,17 +33,25 @@ export type GemminiCaller = (prompt: string) => Promise<string>;
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
 const defaultCaller: GemminiCaller = async (prompt) => {
-  const res = await axios.post(
-    GEMINI_ENDPOINT,
-    {
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
-    },
-    { headers: { "x-goog-api-key": process.env.GEMMINI_API_KEY, "Content-Type": "application/json" } },
-  );
-  const text: string = res.data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  if (!text) throw new Error("Empty response from Gemini");
-  return text;
+  try {
+    const res = await axios.post(
+      GEMINI_ENDPOINT,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
+      },
+      { headers: { "x-goog-api-key": process.env.GEMMINI_API_KEY, "Content-Type": "application/json" } },
+    );
+    const text: string = res.data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    if (!text) throw new Error("Empty response from Gemini");
+    return text;
+  } catch (e: unknown) {
+    if (axios.isAxiosError(e) && e.response) {
+      const detail = JSON.stringify(e.response.data).slice(0, 300);
+      throw new Error(`Gemini API ${e.response.status}: ${detail}`);
+    }
+    throw e;
+  }
 };
 
 function buildPrompt(ctx: GemminiContext): string {

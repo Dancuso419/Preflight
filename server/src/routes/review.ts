@@ -41,7 +41,15 @@ router.post("/", async (req: Request, res: Response) => {
       safe("x402Tester",       () => x402Endpoint ? testX402(x402Endpoint) : Promise.resolve(null), null),
     ]);
 
-    const report = await runGemmini({ repo, app, checklist, contract, x402 });
+    let report;
+    try {
+      report = await runGemmini({ repo, app, checklist, contract, x402 });
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[gemminiEngine]", msg);
+      res.status(502).json({ error: `AI judge unavailable: ${msg}` });
+      return;
+    }
     res.json(report);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Review failed";
