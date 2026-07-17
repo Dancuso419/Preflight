@@ -30,7 +30,7 @@ export interface GemminiReport {
 
 export type GemminiCaller = (prompt: string) => Promise<string>;
 
-const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent";
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent";
 
 const defaultCaller: GemminiCaller = async (prompt) => {
   try {
