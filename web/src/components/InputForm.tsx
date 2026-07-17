@@ -19,7 +19,7 @@ type F = {
   socialPostUrl: string;
 };
 
-type Skippable = "liveUrl" | "contractAddress" | "solution" | "demoVideoUrl";
+type Skippable = "liveUrl" | "contractAddress" | "solution" | "demoVideoUrl" | "x402Endpoint";
 
 const EMPTY: F = {
   repoUrl: "", liveUrl: "", contractAddress: "", network: "testnet",
@@ -255,19 +255,28 @@ export function InputForm({ onSubmit, loading = false }: Props) {
               </div>
               <div className="wiz-fields">
                 <div className="input-group">
-                  <label className="input-label">x402 Endpoint <span className="input-optional">(optional)</span></label>
-                  <input
-                    ref={firstRef as React.RefObject<HTMLInputElement>}
-                    className={`input${touched.x402Endpoint && form.x402Endpoint && !isUrl(form.x402Endpoint) ? " input--error" : form.x402Endpoint && isUrl(form.x402Endpoint) ? " input--valid" : ""}`}
-                    type="url" placeholder="https://your-app.vercel.app/api/resource"
-                    value={form.x402Endpoint}
-                    onChange={(e) => set("x402Endpoint", e.target.value)}
-                    onBlur={() => touch("x402Endpoint")}
-                  />
-                  {touched.x402Endpoint && form.x402Endpoint && !isUrl(form.x402Endpoint)
-                    ? <span className="input-error">Must be a valid URL</span>
-                    : <span className="input-hint">An endpoint that returns HTTP 402 — we run the full 5-step check.</span>
-                  }
+                  <div className="input-label-row">
+                    <label className="input-label">x402 Endpoint <span className="input-optional">(optional)</span></label>
+                    <SkipToggle field="x402Endpoint" label="x402" />
+                  </div>
+                  {skipped.x402Endpoint ? (
+                    <div className="skipped-pill">Skipped — x402 payment flow test won't run</div>
+                  ) : (
+                    <>
+                      <input
+                        ref={firstRef as React.RefObject<HTMLInputElement>}
+                        className={`input${touched.x402Endpoint && form.x402Endpoint && !isUrl(form.x402Endpoint) ? " input--error" : form.x402Endpoint && isUrl(form.x402Endpoint) ? " input--valid" : ""}`}
+                        type="url" placeholder="https://your-app.vercel.app/api/resource"
+                        value={form.x402Endpoint}
+                        onChange={(e) => set("x402Endpoint", e.target.value)}
+                        onBlur={() => touch("x402Endpoint")}
+                      />
+                      {touched.x402Endpoint && form.x402Endpoint && !isUrl(form.x402Endpoint)
+                        ? <span className="input-error">Must be a valid URL</span>
+                        : <span className="input-hint">An endpoint that returns HTTP 402 — we run the full 5-step check.</span>
+                      }
+                    </>
+                  )}
                 </div>
 
                 <div className="input-group">
