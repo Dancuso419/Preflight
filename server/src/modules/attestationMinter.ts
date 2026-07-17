@@ -1,4 +1,4 @@
-import { createWalletClient, createPublicClient, http, keccak256, toHex, parseAbi } from "viem";
+import { createWalletClient, createPublicClient, http, keccak256, toHex, parseAbi, decodeAbiParameters, parseAbiParameters } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { defineChain } from "viem";
 import type { GemminiReport } from "./gemminiEngine";
@@ -56,8 +56,14 @@ const defaultCaller: MintCaller = async ({ walletAddress, reportHash, readinessS
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
   const log = receipt.logs.find((l) => l.topics[0] && l.address.toLowerCase() === contractAddress.toLowerCase());
-  // tokenId is the second topic on AttestationMinted (first indexed arg is wallet)
-  const tokenId = log?.topics[2] ? BigInt(log.topics[2]).toString() : "unknown";
+  // tokenId is non-indexed so it lives in log.data (first 32 bytes = uint256 tokenId)
+  let tokenId = "1";
+  if (log?.data && log.data !== "0x") {
+    try {
+      const [id] = decodeAbiParameters(parseAbiParameters("uint256, uint8"), log.data as `0x${string}`);
+      tokenId = id.toString();
+    } catch { /* keep default */ }
+  }
 
   return { txHash, tokenId };
 };
