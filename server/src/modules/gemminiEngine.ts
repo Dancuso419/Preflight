@@ -30,14 +30,20 @@ export interface GemminiReport {
 
 export type GemminiCaller = (prompt: string) => Promise<string>;
 
-// ponytail: update Content-Type / body shape when Gemmini endpoint format is confirmed
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+
 const defaultCaller: GemminiCaller = async (prompt) => {
   const res = await axios.post(
-    process.env.GEMMINI_MODEL_ENDPOINT!,
-    { prompt },
-    { headers: { Authorization: `Bearer ${process.env.GEMMINI_API_KEY}`, "Content-Type": "application/json" } },
+    GEMINI_ENDPOINT,
+    {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.3, maxOutputTokens: 1024 },
+    },
+    { headers: { "x-goog-api-key": process.env.GEMMINI_API_KEY, "Content-Type": "application/json" } },
   );
-  return typeof res.data === "string" ? res.data : JSON.stringify(res.data);
+  const text: string = res.data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  if (!text) throw new Error("Empty response from Gemini");
+  return text;
 };
 
 function buildPrompt(ctx: GemminiContext): string {
