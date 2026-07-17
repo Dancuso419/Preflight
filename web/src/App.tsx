@@ -417,7 +417,7 @@ function App() {
         {view === "loading" && <LoadingScreen />}
 
         {view === "results" && report && (
-          <div className="container" style={{ paddingBlock: "40px" }}>
+          <div className="container" style={{ paddingBlock: "clamp(20px, 4vw, 40px)" }}>
             <ResultsDashboard report={report} onMint={mintBadge} minting={minting} />
           </div>
         )}
