@@ -19,6 +19,8 @@ type F = {
   socialPostUrl: string;
 };
 
+type Skippable = "liveUrl" | "contractAddress" | "solution" | "demoVideoUrl";
+
 const EMPTY: F = {
   repoUrl: "", liveUrl: "", contractAddress: "", network: "testnet",
   x402Endpoint: "", title: "", problemStatement: "", solution: "",
@@ -38,10 +40,11 @@ const STEPS = [
 
 export function InputForm({ onSubmit, loading = false }: Props) {
   const [form, setForm] = useState<F>(EMPTY);
-  const [step, setStep] = useState(0);           // 0–4
+  const [step, setStep] = useState(0);
   const [dir, setDir] = useState<"fwd" | "back">("fwd");
   const [animating, setAnimating] = useState(false);
   const [touched, setTouched] = useState<Partial<Record<keyof F, boolean>>>({});
+  const [skipped, setSkipped] = useState<Partial<Record<Skippable, boolean>>>({});
   const firstRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const hasNavigated = useRef(false);
 
@@ -50,6 +53,13 @@ export function InputForm({ onSubmit, loading = false }: Props) {
   }
   function touch(key: keyof F) {
     setTouched((p) => ({ ...p, [key]: true }));
+  }
+  function toggleSkip(key: Skippable) {
+    setSkipped((p) => {
+      const next = !p[key];
+      if (next) setForm((f) => ({ ...f, [key]: "" }));
+      return { ...p, [key]: next };
+    });
   }
 
   // Only focus first field after user navigates (not on initial mount)
@@ -70,13 +80,13 @@ export function InputForm({ onSubmit, loading = false }: Props) {
     }, 240);
   }
 
-  // Per-step validity
+  // Per-step validity (skipped fields bypass their check)
   const valid = [
-    isUrl(form.repoUrl) && isUrl(form.liveUrl),
-    isAddr(form.contractAddress),
-    true, // x402 is optional
+    isUrl(form.repoUrl) && (skipped.liveUrl || isUrl(form.liveUrl)),
+    skipped.contractAddress || isAddr(form.contractAddress),
+    true,
     form.title.trim().length > 0 && form.problemStatement.trim().length > 0,
-    isUrl(form.demoVideoUrl),
+    (skipped.demoVideoUrl || isUrl(form.demoVideoUrl)),
   ] as const;
 
   function advance() {
@@ -102,6 +112,14 @@ export function InputForm({ onSubmit, loading = false }: Props) {
 
   const isLast = step === 4;
   const canAdvance = valid[step as 0|1|2|3|4] && !animating;
+
+  function SkipToggle({ field, label }: { field: Skippable; label: string }) {
+    return (
+      <button type="button" className="skip-toggle" onClick={() => toggleSkip(field)}>
+        {skipped[field] ? `↩ Add ${label}` : `Skip — I don't have this`}
+      </button>
+    );
+  }
 
   return (
     <div className="wiz-shell">
@@ -157,16 +175,25 @@ export function InputForm({ onSubmit, loading = false }: Props) {
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label">Live App URL <span className="input-required">*</span></label>
-                  <input
-                    className={`input${touched.liveUrl && !isUrl(form.liveUrl) ? " input--error" : isUrl(form.liveUrl) ? " input--valid" : ""}`}
-                    type="url" placeholder="https://your-app.vercel.app"
-                    value={form.liveUrl}
-                    onChange={(e) => set("liveUrl", e.target.value)}
-                    onBlur={() => touch("liveUrl")}
-                    onKeyDown={(e) => e.key === "Enter" && canAdvance && advance()}
-                  />
-                  {touched.liveUrl && !isUrl(form.liveUrl) && <span className="input-error">Valid URL required</span>}
+                  <div className="input-label-row">
+                    <label className="input-label">Live App URL {!skipped.liveUrl && <span className="input-required">*</span>}</label>
+                    <SkipToggle field="liveUrl" label="live URL" />
+                  </div>
+                  {skipped.liveUrl ? (
+                    <div className="skipped-pill">Skipped — won't affect repo or AI scores</div>
+                  ) : (
+                    <>
+                      <input
+                        className={`input${touched.liveUrl && !isUrl(form.liveUrl) ? " input--error" : isUrl(form.liveUrl) ? " input--valid" : ""}`}
+                        type="url" placeholder="https://your-app.vercel.app"
+                        value={form.liveUrl}
+                        onChange={(e) => set("liveUrl", e.target.value)}
+                        onBlur={() => touch("liveUrl")}
+                        onKeyDown={(e) => e.key === "Enter" && canAdvance && advance()}
+                      />
+                      {touched.liveUrl && !isUrl(form.liveUrl) && <span className="input-error">Valid URL required</span>}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -182,20 +209,29 @@ export function InputForm({ onSubmit, loading = false }: Props) {
               </div>
               <div className="wiz-fields">
                 <div className="input-group">
-                  <label className="input-label">Smart Contract Address <span className="input-required">*</span></label>
-                  <input
-                    ref={firstRef as React.RefObject<HTMLInputElement>}
-                    className={`input input--mono${touched.contractAddress && !isAddr(form.contractAddress) ? " input--error" : isAddr(form.contractAddress) ? " input--valid" : ""}`}
-                    type="text" placeholder="0x..."
-                    value={form.contractAddress}
-                    onChange={(e) => set("contractAddress", e.target.value)}
-                    onBlur={() => touch("contractAddress")}
-                    spellCheck={false}
-                  />
-                  {touched.contractAddress && !isAddr(form.contractAddress)
-                    ? <span className="input-error">Must be a valid 0x address (42 chars)</span>
-                    : <span className="input-hint">Your deployed contract on Monad testnet or mainnet.</span>
-                  }
+                  <div className="input-label-row">
+                    <label className="input-label">Smart Contract Address {!skipped.contractAddress && <span className="input-required">*</span>}</label>
+                    <SkipToggle field="contractAddress" label="contract" />
+                  </div>
+                  {skipped.contractAddress ? (
+                    <div className="skipped-pill">Skipped — contract verification will be marked as not checked</div>
+                  ) : (
+                    <>
+                      <input
+                        ref={firstRef as React.RefObject<HTMLInputElement>}
+                        className={`input input--mono${touched.contractAddress && !isAddr(form.contractAddress) ? " input--error" : isAddr(form.contractAddress) ? " input--valid" : ""}`}
+                        type="text" placeholder="0x..."
+                        value={form.contractAddress}
+                        onChange={(e) => set("contractAddress", e.target.value)}
+                        onBlur={() => touch("contractAddress")}
+                        spellCheck={false}
+                      />
+                      {touched.contractAddress && !isAddr(form.contractAddress)
+                        ? <span className="input-error">Must be a valid 0x address (42 chars)</span>
+                        : <span className="input-hint">Your deployed contract on Monad testnet or mainnet.</span>
+                      }
+                    </>
+                  )}
                 </div>
 
                 <div className="input-group">
@@ -275,16 +311,25 @@ export function InputForm({ onSubmit, loading = false }: Props) {
                 </div>
 
                 <div className="input-group">
-                  <label className="input-label">Your Solution <span className="input-required">*</span></label>
-                  <textarea
-                    className={`input input--textarea${touched.solution && !form.solution.trim() ? " input--error" : form.solution.trim() ? " input--valid" : ""}`}
-                    placeholder="How does your project solve it?"
-                    value={form.solution}
-                    onChange={(e) => set("solution", e.target.value)}
-                    onBlur={() => touch("solution")}
-                    rows={3}
-                  />
-                  {touched.solution && !form.solution.trim() && <span className="input-error">Required</span>}
+                  <div className="input-label-row">
+                    <label className="input-label">Your Solution {!skipped.solution && <span className="input-required">*</span>}</label>
+                    <SkipToggle field="solution" label="solution" />
+                  </div>
+                  {skipped.solution ? (
+                    <div className="skipped-pill">Skipped — AI will base analysis on problem statement only</div>
+                  ) : (
+                    <>
+                      <textarea
+                        className={`input input--textarea${touched.solution && !form.solution.trim() ? " input--error" : form.solution.trim() ? " input--valid" : ""}`}
+                        placeholder="How does your project solve it?"
+                        value={form.solution}
+                        onChange={(e) => set("solution", e.target.value)}
+                        onBlur={() => touch("solution")}
+                        rows={3}
+                      />
+                      {touched.solution && !form.solution.trim() && <span className="input-error">Required</span>}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -300,16 +345,25 @@ export function InputForm({ onSubmit, loading = false }: Props) {
               </div>
               <div className="wiz-fields">
                 <div className="input-group">
-                  <label className="input-label">Demo Video URL <span className="input-required">*</span></label>
-                  <input
-                    ref={firstRef as React.RefObject<HTMLInputElement>}
-                    className={`input${touched.demoVideoUrl && !isUrl(form.demoVideoUrl) ? " input--error" : isUrl(form.demoVideoUrl) ? " input--valid" : ""}`}
-                    type="url" placeholder="https://youtube.com/watch?v=..."
-                    value={form.demoVideoUrl}
-                    onChange={(e) => set("demoVideoUrl", e.target.value)}
-                    onBlur={() => touch("demoVideoUrl")}
-                  />
-                  {touched.demoVideoUrl && !isUrl(form.demoVideoUrl) && <span className="input-error">Valid URL required</span>}
+                  <div className="input-label-row">
+                    <label className="input-label">Demo Video URL {!skipped.demoVideoUrl && <span className="input-required">*</span>}</label>
+                    <SkipToggle field="demoVideoUrl" label="video" />
+                  </div>
+                  {skipped.demoVideoUrl ? (
+                    <div className="skipped-pill">Skipped — demo video won't be included in AI review</div>
+                  ) : (
+                    <>
+                      <input
+                        ref={firstRef as React.RefObject<HTMLInputElement>}
+                        className={`input${touched.demoVideoUrl && !isUrl(form.demoVideoUrl) ? " input--error" : isUrl(form.demoVideoUrl) ? " input--valid" : ""}`}
+                        type="url" placeholder="https://youtube.com/watch?v=..."
+                        value={form.demoVideoUrl}
+                        onChange={(e) => set("demoVideoUrl", e.target.value)}
+                        onBlur={() => touch("demoVideoUrl")}
+                      />
+                      {touched.demoVideoUrl && !isUrl(form.demoVideoUrl) && <span className="input-error">Valid URL required</span>}
+                    </>
+                  )}
                 </div>
 
                 <div className="input-group">
