@@ -82,6 +82,37 @@ const STEPS = [
   "Running AI analysis...",
 ];
 
+function SkeletonResults() {
+  return (
+    <div className="skel-results">
+      <div className="skel-score-card">
+        <div className="skel skel-score-left" />
+        <div className="skel-score-right">
+          <div className="skel skel-line skel-line--md" />
+          <div className="skel skel-line skel-line--sm" />
+          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 10 }}>
+            {["85%", "72%", "90%", "68%"].map((_, i) => (
+              <div key={i} className="skel-bar-row">
+                <div className="skel skel-line skel-line--sm" style={{ height: 10 }} />
+                <div className="skel skel-bar" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="skel-grid">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="skel-insight">
+            <div className="skel skel-line skel-line--md" />
+            <div className="skel skel-line skel-line--lg" />
+            <div className="skel skel-line skel-line--sm" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function LoadingScreen() {
   return (
     <div className="loading-page">
@@ -94,23 +125,24 @@ function LoadingScreen() {
           </div>
         ))}
       </div>
+      <SkeletonResults />
     </div>
   );
 }
 
 // ─── Nav ───────────────────────────────────────────────────────────────
-function Nav({ view, onBack }: { view: View; onBack: () => void }) {
+function Nav({ view, onBack, onRunClick }: { view: View; onBack: () => void; onRunClick: () => void }) {
   return (
     <div className="nav-wrap">
       <nav className="nav">
-        <a className="nav-logo" href="#" onClick={(e) => { e.preventDefault(); onBack(); }}>
+        <button className="nav-logo" onClick={onBack}>
           ✈ PreFlight
           <span className="nav-badge">BETA</span>
-        </a>
+        </button>
         <div className="nav-right">
           {view === "landing" && (
             <button className="btn btn--accent" style={{ padding: "9px 20px", fontSize: "0.88rem", boxShadow: "var(--sh-xs)" }}
-              onClick={() => document.getElementById("run")?.scrollIntoView({ behavior: "smooth" })}>
+              onClick={onRunClick}>
               Run PreFlight →
             </button>
           )}
@@ -134,7 +166,12 @@ const VALIDATORS = [
   { icon: "🤖", name: "AI Judge (Gemmini)", desc: "Category scoring, judge questions, improvement suggestions" },
 ];
 
-function LandingPage({ onSubmit, loading }: { onSubmit: (inputs: ReviewInputs) => void; loading: boolean }) {
+function LandingPage({ onSubmit, loading, formSectionRef, scrollToForm }: {
+  onSubmit: (inputs: ReviewInputs) => void;
+  loading: boolean;
+  formSectionRef: React.RefObject<HTMLElement>;
+  scrollToForm: () => void;
+}) {
   const howRef = useReveal();
   const checkRef = useReveal();
   const demoRef = useReveal();
@@ -154,8 +191,7 @@ function LandingPage({ onSubmit, loading }: { onSubmit: (inputs: ReviewInputs) =
                 5 automated validators + an AI judge persona review your project in ~30 seconds. Get exact fixes while you still have time to apply them.
               </p>
               <div className="hero-ctas">
-                <button className="btn btn--accent btn--xl"
-                  onClick={() => document.getElementById("run")?.scrollIntoView({ behavior: "smooth" })}>
+                <button className="btn btn--accent btn--xl" onClick={scrollToForm}>
                   Run PreFlight Free →
                 </button>
                 <button className="btn btn--ghost btn--lg" onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}>
@@ -273,7 +309,7 @@ function LandingPage({ onSubmit, loading }: { onSubmit: (inputs: ReviewInputs) =
       </section>
 
       {/* FORM ANCHOR */}
-      <section className="form-section-wrap" id="run">
+      <section className="form-section-wrap" ref={formSectionRef as React.RefObject<HTMLDivElement>}>
         <div className="container">
           <div className={`section-heading reveal ${formRef.visible ? "visible" : ""}`} ref={formRef.ref}>
             <h2>Ready to know your score?</h2>
@@ -299,6 +335,17 @@ function App() {
   const [badge, setBadge] = useState<{ txHash: string; tokenId: string; explorerLink: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [minting, setMinting] = useState(false);
+  const formSectionRef = useRef<HTMLElement>(null);
+
+  // Clear any URL hash on mount so browser doesn't auto-scroll to #run
+  useEffect(() => {
+    window.history.replaceState(null, "", window.location.pathname);
+    window.scrollTo(0, 0);
+  }, []);
+
+  function scrollToForm() {
+    formSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  }
 
   async function runReview(inputs: ReviewInputs) {
     setView("loading");
@@ -357,7 +404,7 @@ function App() {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
       <RainbowKitProvider theme={darkTheme({ accentColor: "#B45FFF", accentColorForeground: "#0A0A0A" })}>
-      <Nav view={view} onBack={goHome} />
+      <Nav view={view} onBack={goHome} onRunClick={scrollToForm} />
       <main style={{ flex: 1 }}>
         {error && (
           <div className="container" style={{ paddingTop: "20px" }}>
@@ -365,7 +412,7 @@ function App() {
           </div>
         )}
 
-        {view === "landing" && <LandingPage onSubmit={runReview} loading={false} />}
+        {view === "landing" && <LandingPage onSubmit={runReview} loading={false} formSectionRef={formSectionRef} scrollToForm={scrollToForm} />}
         {view === "loading" && <LoadingScreen />}
 
         {view === "results" && report && (
