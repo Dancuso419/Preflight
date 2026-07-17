@@ -109,9 +109,10 @@ function Nav({ view, onBack }: { view: View; onBack: () => void }) {
         </a>
         <div className="nav-right">
           {view === "landing" && (
-            <a href="#run" className="btn btn--accent" style={{ padding: "9px 20px", fontSize: "0.88rem", boxShadow: "var(--sh-xs)" }}>
+            <button className="btn btn--accent" style={{ padding: "9px 20px", fontSize: "0.88rem", boxShadow: "var(--sh-xs)" }}
+              onClick={() => document.getElementById("run")?.scrollIntoView({ behavior: "smooth" })}>
               Run PreFlight →
-            </a>
+            </button>
           )}
           {(view === "results" || view === "badge") && (
             <button className="btn btn--ghost" onClick={onBack} style={{ fontSize: "0.82rem", padding: "9px 16px", boxShadow: "none" }}>
@@ -153,9 +154,10 @@ function LandingPage({ onSubmit, loading }: { onSubmit: (inputs: ReviewInputs) =
                 5 automated validators + an AI judge persona review your project in ~30 seconds. Get exact fixes while you still have time to apply them.
               </p>
               <div className="hero-ctas">
-                <a href="#run" className="btn btn--accent btn--xl">
+                <button className="btn btn--accent btn--xl"
+                  onClick={() => document.getElementById("run")?.scrollIntoView({ behavior: "smooth" })}>
                   Run PreFlight Free →
-                </a>
+                </button>
                 <button className="btn btn--ghost btn--lg" onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}>
                   How it works
                 </button>
