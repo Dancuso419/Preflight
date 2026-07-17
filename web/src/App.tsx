@@ -428,7 +428,7 @@ function App() {
 
         {view === "results" && report && (
           <div className="container" style={{ paddingBlock: "clamp(20px, 4vw, 40px)" }}>
-            <ResultsDashboard report={report} onMint={mintBadge} minting={minting} onRunAgain={runAgain} />
+            <ResultsDashboard report={report} projectTitle={lastInputs?.submission?.title ?? "My Project"} onMint={mintBadge} minting={minting} onRunAgain={runAgain} />
           </div>
         )}
 

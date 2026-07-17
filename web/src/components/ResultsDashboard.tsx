@@ -2,9 +2,11 @@ import { useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import type { GemminiReport } from "../types";
+import { ShareCard } from "./ShareCard";
 
 interface Props {
   report: GemminiReport;
+  projectTitle: string;
   onMint: (walletAddress: string) => void;
   minting: boolean;
   onRunAgain: () => void;
@@ -25,7 +27,7 @@ function scoreLabel(pct: number): string {
   return pct >= 80 ? "PREFLIGHT READY" : pct >= 60 ? "NEEDS WORK" : "NOT READY";
 }
 
-export function ResultsDashboard({ report, onMint, minting, onRunAgain }: Props) {
+export function ResultsDashboard({ report, projectTitle, onMint, minting, onRunAgain }: Props) {
   const { address, isConnected } = useAccount();
   const [manualAddress, setManualAddress] = useState("");
   const walletAddress = address ?? manualAddress;
@@ -69,6 +71,9 @@ export function ResultsDashboard({ report, onMint, minting, onRunAgain }: Props)
         <div className="ai-card-label">AI Judge Analysis</div>
         <p className="narrative">{report.narrativeFeedback}</p>
       </div>
+
+      {/* ── Share Card ── */}
+      <ShareCard report={report} projectTitle={projectTitle} />
 
       {/* ── Judge Questions + Improvements ── */}
       <div className="insight-grid">
