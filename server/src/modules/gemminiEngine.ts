@@ -61,7 +61,7 @@ function buildPrompt(ctx: GemminiContext): string {
 - checklist completion: ${ctx.checklist.completionPct}% (missing: ${ctx.checklist.missingFields.join(", ") || "none"})
 - Repo eligible: ${ctx.repo.eligible}, README present: ${ctx.repo.readmePresent}, commits: ${ctx.repo.commitCount}, flags: ${ctx.repo.flags.join(", ") || "none"}
 - Live app functional score: ${ctx.app.functionalScore}/100 — ${ctx.app.summary}
-- Contract deployed on Monad: ${ctx.contract.deployed} (${ctx.contract.network})
+${ctx.contract.address ? `- Contract deployed on Monad: ${ctx.contract.deployed} (${ctx.contract.network})` : "- Contract: not applicable to this project — do NOT penalise for omitting it"}
 ${ctx.x402 ? `- x402 payment flow: ${ctx.x402.healthy ? "healthy" : "failing"} — steps: ${ctx.x402.steps.map(s => `${s.step}:${s.passed ? "pass" : "fail"}`).join(", ")}` : "- x402: not applicable to this project — do NOT penalise for omitting it"}
 
 ## Required JSON Output Shape
