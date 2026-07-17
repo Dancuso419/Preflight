@@ -169,7 +169,7 @@ const VALIDATORS = [
 function LandingPage({ onSubmit, loading, formSectionRef, scrollToForm }: {
   onSubmit: (inputs: ReviewInputs) => void;
   loading: boolean;
-  formSectionRef: React.RefObject<HTMLElement>;
+  formSectionRef: React.RefObject<HTMLElement | null>;
   scrollToForm: () => void;
 }) {
   const howRef = useReveal();
@@ -309,7 +309,7 @@ function LandingPage({ onSubmit, loading, formSectionRef, scrollToForm }: {
       </section>
 
       {/* FORM ANCHOR */}
-      <section className="form-section-wrap" ref={formSectionRef as React.RefObject<HTMLDivElement>}>
+      <section className="form-section-wrap" ref={formSectionRef as unknown as React.RefObject<HTMLDivElement>}>
         <div className="container">
           <div className={`section-heading reveal ${formRef.visible ? "visible" : ""}`} ref={formRef.ref}>
             <h2>Ready to know your score?</h2>
