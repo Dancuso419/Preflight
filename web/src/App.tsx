@@ -166,11 +166,12 @@ const VALIDATORS = [
   { icon: "🤖", name: "AI Judge (Gemmini)", desc: "Category scoring, judge questions, improvement suggestions" },
 ];
 
-function LandingPage({ onSubmit, loading, formSectionRef, scrollToForm }: {
+function LandingPage({ onSubmit, loading, formSectionRef, scrollToForm, initialValues }: {
   onSubmit: (inputs: ReviewInputs) => void;
   loading: boolean;
   formSectionRef: React.RefObject<HTMLElement | null>;
   scrollToForm: () => void;
+  initialValues?: ReviewInputs;
 }) {
   const howRef = useReveal();
   const checkRef = useReveal();
@@ -315,7 +316,7 @@ function LandingPage({ onSubmit, loading, formSectionRef, scrollToForm }: {
             <h2>Ready to know your score?</h2>
             <p>Fill in your project details below. Results in ~30 seconds.</p>
           </div>
-          <InputForm onSubmit={onSubmit} loading={loading} />
+          <InputForm onSubmit={onSubmit} loading={loading} initialValues={initialValues} />
         </div>
       </section>
 
@@ -335,6 +336,7 @@ function App() {
   const [badge, setBadge] = useState<{ txHash: string; tokenId: string; explorerLink: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [minting, setMinting] = useState(false);
+  const [lastInputs, setLastInputs] = useState<ReviewInputs | null>(null);
   const formSectionRef = useRef<HTMLElement>(null);
 
   // Clear any URL hash on mount so browser doesn't auto-scroll to #run
@@ -347,7 +349,15 @@ function App() {
     formSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   }
 
+  function runAgain() {
+    setView("landing");
+    setReport(null);
+    setError(null);
+    setTimeout(() => formSectionRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+  }
+
   async function runReview(inputs: ReviewInputs) {
+    setLastInputs(inputs);
     setView("loading");
     setError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -413,12 +423,12 @@ function App() {
           </div>
         )}
 
-        {view === "landing" && <LandingPage onSubmit={runReview} loading={false} formSectionRef={formSectionRef} scrollToForm={scrollToForm} />}
+        {view === "landing" && <LandingPage onSubmit={runReview} loading={false} formSectionRef={formSectionRef} scrollToForm={scrollToForm} initialValues={lastInputs ?? undefined} />}
         {view === "loading" && <LoadingScreen />}
 
         {view === "results" && report && (
           <div className="container" style={{ paddingBlock: "clamp(20px, 4vw, 40px)" }}>
-            <ResultsDashboard report={report} onMint={mintBadge} minting={minting} />
+            <ResultsDashboard report={report} onMint={mintBadge} minting={minting} onRunAgain={runAgain} />
           </div>
         )}
 

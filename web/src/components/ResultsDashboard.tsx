@@ -7,6 +7,7 @@ interface Props {
   report: GemminiReport;
   onMint: (walletAddress: string) => void;
   minting: boolean;
+  onRunAgain: () => void;
 }
 
 const CAT_LABELS: Record<string, string> = {
@@ -24,7 +25,7 @@ function scoreLabel(pct: number): string {
   return pct >= 80 ? "PREFLIGHT READY" : pct >= 60 ? "NEEDS WORK" : "NOT READY";
 }
 
-export function ResultsDashboard({ report, onMint, minting }: Props) {
+export function ResultsDashboard({ report, onMint, minting, onRunAgain }: Props) {
   const { address, isConnected } = useAccount();
   const [manualAddress, setManualAddress] = useState("");
   const walletAddress = address ?? manualAddress;
@@ -138,6 +139,10 @@ export function ResultsDashboard({ report, onMint, minting }: Props) {
             <p className="narrative">Apply the improvements above, then re-submit. Badge threshold is 80%.</p>
           </>
         )}
+
+        <button className="btn btn--ghost" onClick={onRunAgain} style={{ marginTop: "16px", width: "100%" }}>
+          ↺ Run Again
+        </button>
       </div>
     </div>
   );

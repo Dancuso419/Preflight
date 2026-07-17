@@ -4,6 +4,7 @@ import type { ReviewInputs, SubmissionFields } from "../types";
 interface Props {
   onSubmit: (inputs: ReviewInputs) => void;
   loading?: boolean;
+  initialValues?: ReviewInputs;
 }
 
 type F = {
@@ -38,8 +39,23 @@ const STEPS = [
   { label: "Demo",        short: "Demo" },
 ];
 
-export function InputForm({ onSubmit, loading = false }: Props) {
-  const [form, setForm] = useState<F>(EMPTY);
+export function InputForm({ onSubmit, loading = false, initialValues }: Props) {
+  const [form, setForm] = useState<F>(() => {
+    if (!initialValues) return EMPTY;
+    return {
+      ...EMPTY,
+      repoUrl: initialValues.repoUrl ?? "",
+      liveUrl: initialValues.liveUrl ?? "",
+      contractAddress: initialValues.contractAddress ?? "",
+      network: initialValues.network ?? "testnet",
+      x402Endpoint: initialValues.x402Endpoint ?? "",
+      title: initialValues.submission.title ?? "",
+      problemStatement: initialValues.submission.problemStatement ?? "",
+      solution: initialValues.submission.solution ?? "",
+      demoVideoUrl: initialValues.submission.demoVideoUrl ?? "",
+      socialPostUrl: initialValues.submission.socialPostUrl ?? "",
+    };
+  });
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState<"fwd" | "back">("fwd");
   const [animating, setAnimating] = useState(false);
